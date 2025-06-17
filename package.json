@@ -1,0 +1,330 @@
+{
+  "name": "ai-code-review",
+  "displayName": "AI Code Review",
+  "description": "AI-powered code review extension with GitHub integration",
+  "version": "1.0.0",
+  "publisher": "ai-code-review-publisher",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Linters",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "code review",
+    "ai",
+    "github",
+    "llm",
+    "analysis"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "views": {
+      "codeReview": [
+        {
+          "id": "codeReviewExplorer",
+          "name": "Code Reviews",
+          "when": "codeReview.authenticated"
+        },
+        {
+          "id": "codeReviewHistory",
+          "name": "Review History",
+          "when": "codeReview.authenticated"
+        },
+        {
+          "id": "codeReviewSettings",
+          "name": "Settings",
+          "when": "codeReview.authenticated"
+        }
+      ],
+      "explorer": [
+        {
+          "id": "codeReviewQuickActions",
+          "name": "AI Code Review",
+          "when": "codeReview.authenticated"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codeReview",
+          "title": "AI Code Review",
+          "icon": "$(search-view-icon)"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "codeReview.authenticate",
+        "title": "Authenticate with GitHub",
+        "category": "Code Review",
+        "icon": "$(github)"
+      },
+      {
+        "command": "codeReview.logout",
+        "title": "Logout",
+        "category": "Code Review",
+        "icon": "$(sign-out)"
+      },
+      {
+        "command": "codeReview.reviewWorkspace",
+        "title": "Review Workspace",
+        "category": "Code Review",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "codeReview.reviewSelectedFiles",
+        "title": "Review Selected Files",
+        "category": "Code Review",
+        "icon": "$(file)"
+      },
+      {
+        "command": "codeReview.showSettings",
+        "title": "Settings",
+        "category": "Code Review",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "codeReview.showResults",
+        "title": "Show Results",
+        "category": "Code Review",
+        "icon": "$(list-selection)"
+      },
+      {
+        "command": "codeReview.checkStatus",
+        "title": "Check Status",
+        "category": "Code Review",
+        "icon": "$(pulse)"
+      },
+      {
+        "command": "codeReview.openWebview",
+        "title": "Open Review Dashboard",
+        "category": "Code Review",
+        "icon": "$(browser)"
+      },
+      {
+        "command": "codeReview.refreshExplorer",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "codeReview.refreshHistory",
+        "title": "Refresh History",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "codeReview.deleteReview",
+        "title": "Delete Review",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "codeReview.exportResults",
+        "title": "Export Results",
+        "icon": "$(export)"
+      },
+      {
+        "command": "codeReview.showReviewDetails",
+        "title": "Show Details",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "codeReview.quickReview",
+        "title": "Quick Review",
+        "icon": "$(zap)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "codeReview.refreshExplorer",
+          "when": "view == codeReviewExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "codeReview.refreshHistory",
+          "when": "view == codeReviewHistory",
+          "group": "navigation"
+        },
+        {
+          "command": "codeReview.openWebview",
+          "when": "view == codeReviewExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "codeReview.showReviewDetails",
+          "when": "view == codeReviewExplorer && viewItem == review",
+          "group": "inline"
+        },
+        {
+          "command": "codeReview.deleteReview",
+          "when": "view == codeReviewExplorer && viewItem == review",
+          "group": "inline"
+        },
+        {
+          "command": "codeReview.exportResults",
+          "when": "view == codeReviewHistory && viewItem == completedReview",
+          "group": "inline"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "codeReview.reviewSelectedFiles",
+          "when": "explorerResourceIsFolder || resourceExtname in codeReview.supportedExtensions",
+          "group": "codeReview"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "codeReview.reviewSelectedFiles",
+          "when": "resourceExtname in codeReview.supportedExtensions",
+          "group": "codeReview"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "codeReview.quickReview",
+          "when": "resourceExtname in codeReview.supportedExtensions",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codeReview.reviewSelectedFiles",
+          "when": "false"
+        },
+        {
+          "command": "codeReview.refreshExplorer",
+          "when": "false"
+        },
+        {
+          "command": "codeReview.refreshHistory",
+          "when": "false"
+        },
+        {
+          "command": "codeReview.deleteReview",
+          "when": "false"
+        },
+        {
+          "command": "codeReview.showReviewDetails",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AI Code Review",
+      "properties": {
+        "codeReview.backendUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "Backend API URL"
+        },
+        "codeReview.websocketUrl": {
+          "type": "string",
+          "default": "ws://localhost:8000",
+          "description": "WebSocket URL for real-time updates"
+        },
+        "codeReview.defaultLLMModel": {
+          "type": "string",
+          "default": "gpt-4",
+          "description": "Default LLM model for code review",
+          "enum": [
+            "gpt-4",
+            "gpt-4-turbo",
+            "gpt-3.5-turbo",
+            "claude-3-opus",
+            "claude-3-sonnet",
+            "claude-3-haiku",
+            "CEREBRAS::llama-3.3-70b",
+            "CEREBRAS::llama-4-scout-17b-16e-instruct"
+          ]
+        },
+        "codeReview.defaultStandards": {
+          "type": "array",
+          "default": [
+            "Use snake_case for variable names",
+            "Use camelCase for function names",
+            "Use PascalCase for class names",
+            "Use uppercase for constants"
+          ],
+          "description": "Default coding standards to check"
+        },
+        "codeReview.defaultMetrics": {
+          "type": "array",
+          "default": [
+            "Code complexity",
+            "Code duplication",
+            "Code coverage"
+          ],
+          "description": "Default metrics to analyze"
+        },
+        "codeReview.maxFileSize": {
+          "type": "number",
+          "default": 1048576,
+          "description": "Maximum file size in bytes (1MB)"
+        },
+        "codeReview.maxTotalSize": {
+          "type": "number",
+          "default": 10485760,
+          "description": "Maximum total size in bytes (10MB)"
+        },
+        "codeReview.maxFiles": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum number of files to review"
+        },
+        "codeReview.autoReview": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically review files on save"
+        },
+        "codeReview.notifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show notifications for review completion"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@types/ws": "^8.5.10",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "@vscode/vsce": "^2.15.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "minimatch": "^9.0.5",
+    "ws": "^8.16.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/ai-code-review-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/ai-code-review-extension/issues"
+  },
+  "homepage": "https://github.com/your-username/ai-code-review-extension#readme",
+  "license": "MIT"
+}
